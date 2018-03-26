@@ -1,5 +1,8 @@
 # RESTful-API
 
+只是对restful API的一个了解，
+todo/api/v1.0/member ：获取本宿舍所有人的名字
+todo/api/v1.0/member/(name) ：获取本宿舍其中一个人的信息
 # REST的六个特性：
 
     Client-Server：服务器端与客户端分离。
