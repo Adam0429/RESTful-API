@@ -68,3 +68,56 @@ zookeeper 是一种集中管理数据的方法，用于确保一致性和稳定�
 1.	py 创建了两个节点，并创建子节点去观察父节点
 znode 可以实现存储数据
 
+
+###Docker
+数据创建名称叫mariadb。 
+跑http。
+
+docker run -d -p 5000:5000 --name py-http --link mariadb:mysql demo/py-http:1.0
+1
+特别注意这里的–link 容器名:昵称，然后对于py-http容器来说mysql就是昵称了。 
+可以直接看下evn环境：
+
+# docker exec -it py-http bash
+bash-4.3# env
+HOSTNAME=db7f7aba7c2f
+MYSQL_ENV_MYSQL_ROOT_PASSWORD=root
+MYSQL_ENV_MARIADB_VERSION=10.1.19+maria-1~jessie
+MYSQL_ENV_GOSU_VERSION=1.7
+MYSQL_PORT_3306_TCP_PORT=3306
+MYSQL_ENV_MARIADB_MAJOR=10.1
+MYSQL_PORT_3306_TCP=tcp://172.17.0.2:3306
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PWD=/
+TZ=Asia/Shanghai
+SHLVL=1
+HOME=/root
+MYSQL_NAME=/py-http/mysql
+MYSQL_PORT_3306_TCP_PROTO=tcp
+MYSQL_PORT_3306_TCP_ADDR=172.17.0.2
+MYSQL_PORT=tcp://172.17.0.2:3306
+_=/usr/bin/env
+ 
+
+
+可以看到，在py-http容器下面已经把mariadb容器的环境变量直接引入了。 
+并且查看hosts:
+
+# cat /etc/hosts
+127.0.0.1       localhost
+::1     localhost ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+172.17.0.2      mysql 48bd5fbf3ddc mariadb
+172.17.0.3      db7f7aba7c2f
+
+可以看到有了mysql变量的host了。 
+在外部访问：就说明测试成功。数据库能插入查询了。
+
+# curl http://127.0.0.1:5000/add
+ok[root@localhost http]# curl http://127.0.0.1:5000/list
+results:
+id:1,name:zhangsan
+id:2,name:zhangsan
