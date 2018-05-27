@@ -70,54 +70,73 @@ znode 可以实现存储数据
 
 
 ###Docker
-数据创建名称叫mariadb。 
-跑http。
 
-docker run -d -p 5000:5000 --name py-http --link mariadb:mysql demo/py-http:1.0
-1
-特别注意这里的–link 容器名:昵称，然后对于py-http容器来说mysql就是昵称了。 
-可以直接看下evn环境：
+Dockerfile用来创建一个自定义的image,包含了用户指定的软件依赖等。当前目录下包含Dockerfile,使用命令build来创建新的image,并命名为edwardsbean/centos6-jdk1.7:
 
-# docker exec -it py-http bash
-bash-4.3# env
-HOSTNAME=db7f7aba7c2f
-MYSQL_ENV_MYSQL_ROOT_PASSWORD=root
-MYSQL_ENV_MARIADB_VERSION=10.1.19+maria-1~jessie
-MYSQL_ENV_GOSU_VERSION=1.7
-MYSQL_PORT_3306_TCP_PORT=3306
-MYSQL_ENV_MARIADB_MAJOR=10.1
-MYSQL_PORT_3306_TCP=tcp://172.17.0.2:3306
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-PWD=/
-TZ=Asia/Shanghai
-SHLVL=1
-HOME=/root
-MYSQL_NAME=/py-http/mysql
-MYSQL_PORT_3306_TCP_PROTO=tcp
-MYSQL_PORT_3306_TCP_ADDR=172.17.0.2
-MYSQL_PORT=tcp://172.17.0.2:3306
-_=/usr/bin/env
- 
+如何编写一个Dockerfile,格式如下：
+
+# CommentINSTRUCTION arguments
+FROM
 
 
-可以看到，在py-http容器下面已经把mariadb容器的环境变量直接引入了。 
-并且查看hosts:
+基于哪个镜像
 
-# cat /etc/hosts
-127.0.0.1       localhost
-::1     localhost ip6-localhost ip6-loopback
-fe00::0 ip6-localnet
-ff00::0 ip6-mcastprefix
-ff02::1 ip6-allnodes
-ff02::2 ip6-allrouters
-172.17.0.2      mysql 48bd5fbf3ddc mariadb
-172.17.0.3      db7f7aba7c2f
+RUN
 
-可以看到有了mysql变量的host了。 
-在外部访问：就说明测试成功。数据库能插入查询了。
 
-# curl http://127.0.0.1:5000/add
-ok[root@localhost http]# curl http://127.0.0.1:5000/list
-results:
-id:1,name:zhangsan
-id:2,name:zhangsan
+安装软件用
+
+MAINTAINER
+
+
+镜像创建者
+
+CMD
+
+
+container启动时执行的命令，但是一个Dockerfile中只能有一条CMD命令，多条则只执行最后一条CMD.
+
+
+CMD主要用于container时启动指定的服务，当docker run command的命令匹配到CMD command时，会替换CMD执行的命令。如:
+Dockerfile:
+
+CMD echo hello world
+
+运行一下试试:
+
+edwardsbean@ed-pc:~/software/docker-image/centos-add-test$ docker run centos-cmd
+hello world
+
+一旦命令匹配：
+
+edwardsbean@ed-pc:~/software/docker-image/centos-add-test$ docker run centos-cmd echo hello edwardsbean
+hello edwardsbean
+ENTRYPOINT
+
+
+container启动时执行的命令，但是一个Dockerfile中只能有一条ENTRYPOINT命令，如果多条，则只执行最后一条
+
+
+ENTRYPOINT没有CMD的可替换特性
+
+USER
+
+
+使用哪个用户跑container
+
+如：
+
+ENTRYPOINT ["memcached"]
+USER daemon
+EXPOSE
+
+
+container内部服务开启的端口。主机上要用还得在启动container时，做host-container的端口映射：
+
+docker run -d -p 127.0.0.1:33301:22 centos6-ssh
+
+container ssh服务的22端口被映射到主机的33301端口 
+
+Fig
+
+Fig 主要用来跟 Docker 一起来构建基于 Docker 的复杂应用，Fig 通过一个配置文件来管理多个Docker容器，非常适合组合使用多个容器进行开发的场景。目前Fig已经升级并更名为Compose。
