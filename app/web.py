@@ -34,6 +34,13 @@ def add_blog(name):
 	db.commit()
 	return 'add success'
 
+@app.route('/rpc') 
+def rpcservice(): 
+	import xmlrpc.client
+	proxy = xmlrpc.client.ServerProxy("http://localhost:8000/")
+	today = proxy.f1()
+	return today
+	
 class Service(object):
 	_instance = None
 	def __new__(cls, *args, **kw):
