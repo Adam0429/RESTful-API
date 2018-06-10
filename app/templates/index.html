@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h3>Hello</h3>
+    <ul>
+        {%for data in datas%}
+        <li>
+            {{data}}
+        </li>
+        {%else%}
+        <h3>no result</h3>
+        {%endfor%}
+    </ul>
+
+</body>
+</html>
